@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sidebar AI · 设置</title>
+  <link rel="stylesheet" href="options.css" />
+</head>
+<body>
+  <header>
+    <h1>Sidebar AI 设置</h1>
+    <nav>
+      <button type="button" class="nav-btn active" data-tab="providers">模型</button>
+      <button type="button" class="nav-btn" data-tab="templates">Prompt 模板</button>
+      <button type="button" class="nav-btn" data-tab="general">通用</button>
+      <button type="button" class="nav-btn" data-tab="diagnostics">诊断</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- 模型管理 -->
+    <section class="tab active" id="tab-providers">
+      <div class="row">
+        <button type="button" id="addProviderBtn" class="primary-btn">+ 添加 Provider</button>
+        <span class="hint" id="providerHint"></span>
+      </div>
+      <div class="card mt-12">
+        <h3 class="mt-0">隐私与图像识别</h3>
+        <p class="hint mt-4 mb-8">控制图片识别的行为：是否默认使用本地 Ollama（仅本地，不会把图片发到网络）或允许将图片发送给已配置 provider（会把图片以 DataURL 发送）。</p>
+        <label>
+          <span>默认图片处理</span>
+          <select id="visionDefaultMode" title="默认图片识别处理方式">
+            <option value="ask">每次询问（推荐）</option>
+            <option value="send">发送到 provider（可能会上传图片）</option>
+            <option value="local">仅本地 Ollama（隐私优先）</option>
+          </select>
+        </label>
+        <label>
+          <input type="checkbox" id="visionRememberConsent" />
+          <span>记住我的同意（勾选后将不再每次询问）</span>
+        </label>
+        <p class="small-muted">说明：当选择“发送到 provider”时，图片将以 DataURL 嵌入到给模型的消息中；某些 provider 需要专门的 vision API，请在 Provider 设置中确认支持。若选择“仅本地 Ollama”，请确保本地 Ollama 已配置并为当前 provider。</p>
+      </div>
+      <div id="providerList" class="card-list"></div>
+    </section>
+
+    <!-- Prompt 模板 -->
+    <section class="tab" id="tab-templates">
+      <div class="row">
+        <button type="button" id="addTemplateBtn" class="primary-btn">+ 添加模板</button>
+        <span class="hint">模板支持变量：<code>{{title}}</code> <code>{{content}}</code> <code>{{targetLang}}</code> <code>{{length}}</code></span>
+      </div>
+      <div id="templateList" class="card-list"></div>
+    </section>
+
+    <!-- 通用 -->
+    <section class="tab" id="tab-general">
+      <div class="card">
+        <label>
+          <span>目标语言</span>
+          <select id="generalLang" title="默认目标语言">
+            <option value="zh-CN">中文（简体）</option>
+            <option value="zh-TW">中文（繁體）</option>
+            <option value="en">English</option>
+            <option value="ja">日本語</option>
+            <option value="ko">한국어</option>
+            <option value="fr">Français</option>
+            <option value="de">Deutsch</option>
+            <option value="es">Español</option>
+          </select>
+        </label>
+        <label>
+          <span>总结长度</span>
+          <select id="generalLength" title="默认总结长度">
+            <option value="short">简短</option>
+            <option value="medium">中等</option>
+            <option value="long">详尽</option>
+          </select>
+        </label>
+        <label>
+          <span>流式输出</span>
+          <select id="generalStreaming" title="是否默认开启流式输出">
+            <option value="false">关闭（推荐，更稳定）</option>
+            <option value="true">开启（边输出边显示）</option>
+          </select>
+        </label>
+        <label>
+          <span>主题</span>
+          <select id="generalTheme" title="默认主题">
+            <option value="system">跟随系统</option>
+            <option value="light">浅色</option>
+            <option value="dark">深色</option>
+            <option value="sepia">米黄护眼</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="card mt-12">
+        <h3 class="mt-0">自动总结</h3>
+        <p class="hint mt-4 mb-8">填入要自动总结的域名（每行一个，比如 <code>zhuanlan.zhihu.com</code>），打开匹配页面时会自动总结并打开 sidebar。</p>
+        <textarea id="autoSummarizeDomains" rows="3" placeholder="zhuanlan.zhihu.com&#10;medium.com"></textarea>
+      </div>
+
+      <div class="card mt-12">
+        <h3 class="mt-0">快捷键</h3>
+        <p class="hint mt-4 mb-8">提示：Firefox 快捷键需到 <code>about:addons</code> → 此扩展 → "管理扩展快捷键" 修改。</p>
+        <div class="small-muted">
+          <div>总结当前页：<code>Alt+Shift+S</code></div>
+          <div>翻译当前页：<code>Alt+Shift+T</code></div>
+          <div>切换 sidebar：<code>Alt+Shift+A</code></div>
+        </div>
+      </div>
+
+      <div class="card mt-12">
+        <h3 class="mt-0">配置导入/导出</h3>
+        <p class="hint mt-4 mb-8">导出当前所有 Provider / 模型 / Prompt 模板配置（API Key 脱敏处理），方便多设备同步或备份。</p>
+        <div class="row mb-0">
+          <button type="button" id="exportConfigBtn" class="primary-btn">导出配置</button>
+          <button type="button" id="importConfigBtn" class="ghost-btn">导入配置</button>
+          <input type="file" id="importConfigInput" accept="application/json" class="hidden" title="导入配置文件 (.json)" />
+        </div>
+      </div>
+    </section>
+
+    <!-- 诊断 -->
+    <section class="tab" id="tab-diagnostics">
+      <div class="row">
+        <button type="button" id="diagRefreshBtn" class="ghost-btn">刷新</button>
+        <button type="button" id="diagExportBtn" class="primary-btn">导出完整诊断包</button>
+        <button type="button" id="diagCopyAllBtn" class="ghost-btn">复制全部最近错误</button>
+        <button type="button" id="diagTestBtn" class="ghost-btn">测试错误报告</button>
+        <button type="button" id="diagClearBtn" class="danger-btn">清空</button>
+        <span class="hint" id="diagHint"></span>
+      </div>
+      <div class="card">
+        <div class="row mb-8">
+          <label class="label-inline">
+            <input type="checkbox" id="diagFilterError" checked />
+            <span>错误</span>
+          </label>
+          <label class="label-inline">
+            <input type="checkbox" id="diagFilterWarn" checked />
+            <span>警告</span>
+          </label>
+          <label class="label-inline">
+            <input type="checkbox" id="diagFilterInfo" />
+            <span>信息</span>
+          </label>
+          <input type="text" id="diagFilterScope" placeholder="按 scope 过滤（支持正则）" class="flex-input" />
+        </div>
+        <ul id="diagList" class="diag-list"></ul>
+      </div>
+    </section>
+  </main>
+
+  <!-- Provider 编辑弹窗 -->
+  <dialog id="providerDialog" class="dialog">
+    <form method="dialog" id="providerForm">
+      <h2 id="providerDialogTitle">添加 Provider</h2>
+      <input type="hidden" name="id" />
+      <label>
+        <span>类型</span>
+        <select name="builtinId" id="providerBuiltinSelect" title="Provider 类型"></select>
+      </label>
+      <label>
+        <span>名称（可选）</span>
+        <input name="label" type="text" placeholder="如：我的 DeepSeek" />
+      </label>
+      <label>
+        <span>Base URL</span>
+        <input name="baseUrl" type="text" required />
+      </label>
+      <label>
+        <span>API Key</span>
+        <input name="apiKey" type="password" placeholder="sk-..." />
+      </label>
+      <label>
+        <span>分组</span>
+        <input name="group" type="text" placeholder="主力 / 备用 / 实验性" list="groupOptions" />
+        <datalist id="groupOptions"></datalist>
+      </label>
+
+      <div class="fetch-row">
+        <button type="button" id="fetchModelsBtn" class="ghost-btn">
+          <span class="btn-label">🔍 从服务端获取模型列表</span>
+        </button>
+        <span class="hint" id="fetchHint"></span>
+      </div>
+
+        <h3>
+        模型
+        <span class="hint" id="modelCountHint"></span>
+        <button type="button" id="selectAllModelsBtn" class="mini-btn hidden">全选</button>
+        <button type="button" id="deselectAllModelsBtn" class="mini-btn hidden">全不选</button>
+      </h3>
+      <div id="providerModels" class="models-list"></div>
+      <button type="button" id="addModelBtn" class="ghost-btn">+ 手动添加模型</button>
+
+      <div class="dialog-actions">
+        <button type="button" value="cancel" class="ghost-btn">取消</button>
+        <button type="button" value="save" class="primary-btn" id="providerSaveBtn">保存</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Template 编辑弹窗 -->
+  <dialog id="templateDialog" class="dialog">
+    <form method="dialog" id="templateForm">
+      <h2>编辑 Prompt 模板</h2>
+      <input type="hidden" name="id" />
+      <label>
+        <span>名称</span>
+        <input name="name" type="text" required />
+      </label>
+      <label>
+        <span>作用域</span>
+        <select name="scope" title="模板作用域">
+          <option value="summary">总结</option>
+          <option value="translate">翻译</option>
+          <option value="chat">对话</option>
+        </select>
+      </label>
+      <label>
+        <span>内容（支持 <code>{{title}}</code> <code>{{content}}</code> <code>{{targetLang}}</code> <code>{{length}}</code>）</span>
+        <textarea name="content" rows="14" required></textarea>
+      </label>
+      <div class="dialog-actions">
+        <button type="button" value="cancel" class="ghost-btn">取消</button>
+        <button type="button" value="save" class="primary-btn">保存</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script type="module" src="options.js"></script>
+</body>
+</html>

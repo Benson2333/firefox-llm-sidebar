@@ -1,0 +1,83 @@
+{
+  "manifest_version": 3,
+  "name": "LLM 侧边栏",
+  "version": "0.2.0",
+  "description": "在 Firefox 侧边栏中调用任意 LLM（OpenAI、Claude、Gemini、DeepSeek、Ollama 等），总结/翻译/聊天，自带 API key。",
+
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "llm-sidebar@local.dev",
+      "strict_min_version": "142.0"
+    }
+  },
+
+  "permissions": [
+    "storage",
+    "tabs",
+    "activeTab",
+    "scripting",
+    "contextMenus",
+    "alarms"
+  ],
+
+  "host_permissions": [
+    "<all_urls>"
+  ],
+
+  "background": {
+    "scripts": ["background/background.js"],
+    "type": "module"
+  },
+
+  "sidebar_action": {
+    "default_title": "LLM 侧边栏",
+    "default_panel": "sidebar/sidebar.html",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png",
+      "48": "icons/icon-48.png"
+    }
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content/content.js"],
+      "run_at": "document_idle",
+      "all_frames": false
+    }
+  ],
+
+  "options_ui": {
+    "page": "options/options.html",
+    "open_in_tab": true
+  },
+
+  "commands": {
+    "summarize-page": {
+      "suggested_key": {
+        "default": "Alt+Shift+S"
+      },
+      "description": "Summarize the current page"
+    },
+    "translate-page": {
+      "suggested_key": {
+        "default": "Alt+Shift+T"
+      },
+      "description": "Translate the current page"
+    },
+    "toggle-sidebar": {
+      "suggested_key": {
+        "default": "Alt+Shift+A"
+      },
+      "description": "Open/close the AI sidebar"
+    }
+  },
+
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  }
+}

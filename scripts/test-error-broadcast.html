@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Sidebar AI — Error Reporter Test</title>
+  <style>body{font-family:system-ui,Segoe UI,Roboto,Arial;margin:20px}pre{background:#f6f8fa;padding:10px;border-radius:6px}</style>
+</head>
+<body>
+  <h2>测试：Error Reporter 广播</h2>
+  <p>点击下面按钮会调用 `reportError` 并在页面上显示收到的广播 payload。</p>
+  <button id="runBtn">触发测试错误并广播</button>
+  <div id="out"></div>
+  <pre id="log"></pre>
+  <script type="module" src="./test-error-broadcast.js"></script>
+</body>
+</html>

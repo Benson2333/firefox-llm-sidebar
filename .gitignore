@@ -1,0 +1,48 @@
+# Node / npm
+node_modules/
+.npm-cache/
+npm-debug.log
+yarn-error.log
+yarn.lock
+package-lock.json
+
+# Build artifacts
+dist/
+web-ext-artifacts/
+*.zip
+*.xpi
+*.crx
+*.pem
+*.sig
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# OS
+.DS_Store
+desktop.ini
+
+# Logs
+*.log
+logs/
+
+# Env / secrets
+.env
+.env.local
+.env.*.local
+*.key
+*.secret
+api-keys.txt
+secrets/
+
+# OS temp
+$RECYCLE.BIN/
+
+# web-ext
+.web-ext/
