@@ -35,7 +35,7 @@ web-ext --version
 
 ```bash
 cd firefox-llm-sidebar
-web-ext lint --config=web-ext-config.js
+web-ext lint --config=web-ext-config.cjs
 ```
 
 **目标：0 errors**。Warnings 也要看完，能修就修。
@@ -53,7 +53,7 @@ node parse-all.mjs
 ### 4. 打成未签名 .xpi
 
 ```bash
-web-ext build --config=web-ext-config.js
+web-ext build --config=web-ext-config.cjs
 ```
 
 产物：`dist/llm-sidebar-0.2.0.zip`（web-ext 默认 zip 扩展名，Firefox 把它当 .xpi 一样认）。
@@ -96,7 +96,7 @@ $env:AMO_API_KEY = "user:XXXXXXX"
 $env:AMO_API_SECRET = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 
 # 签名
-web-ext sign --config=web-ext-config.js --api-key="$env:AMO_API_KEY" --api-secret="$env:AMO_API_SECRET"
+web-ext sign --config=web-ext-config.cjs --api-key="$env:AMO_API_KEY" --api-secret="$env:AMO_API_SECRET"
 ```
 
 签名后产物：`dist/llm-sidebar-0.2.0.xpi`（web-ext 会改扩展名）。

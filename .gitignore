@@ -1,6 +1,7 @@
 # Node / npm
 node_modules/
 .npm-cache/
+.npm-cache-tmp/
 npm-debug.log
 yarn-error.log
 yarn.lock

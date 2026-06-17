@@ -79,7 +79,7 @@ $env:AMO_API_SECRET = "a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0"
 
 ```bash
 cd firefox-llm-sidebar
-web-ext sign --config=web-ext-config.js
+web-ext sign --config=web-ext-config.cjs
 ```
 
 第一次签名可能 5-10 分钟。成功后会输出：

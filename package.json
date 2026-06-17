@@ -2,11 +2,18 @@
   "name": "firefox-llm-sidebar",
   "version": "0.1.0",
   "private": true,
-  "description": "Firefox MV3 sidebar extension - development helper manifest for dev dependencies",
+  "description": "Firefox MV3 sidebar extension that integrates multiple LLM providers (OpenAI, DeepSeek, Claude, Gemini, Ollama, ...) for page summarization, translation, and chat.",
   "scripts": {
-    "parse": "node parse-all.mjs ."
+    "parse": "node parse-all.mjs .",
+    "lint": "web-ext lint --self-hosted --output text --pretty --no-config-discovery --ignore-files vendor/purify.es.mjs --ignore-files lib/stream-renderer.js",
+    "build": "web-ext build --overwrite-dest --artifacts-dir=./dist --no-config-discovery --ignore-files vendor/purify.es.mjs --ignore-files lib/stream-renderer.js --ignore-files package-lock.json",
+    "sign": "web-ext sign --api-key=$AMO_API_KEY --api-secret=$AMO_API_SECRET --no-config-discovery",
+    "run": "web-ext run --keep-profile-changes --browser-console --devtools --pref=extensions.webapi.testing=true --no-config-discovery",
+    "test:broadcast": "node scripts/test-error-broadcast.js"
   },
   "devDependencies": {
-    "acorn": "^8.17.0"
+    "acorn": "^8.17.0",
+    "web-ext": "^10.4.0"
   }
 }
+
