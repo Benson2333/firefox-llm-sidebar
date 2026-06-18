@@ -194,9 +194,14 @@ function bindProviderDialog() {
   $("deselectAllModelsBtn").addEventListener("click", () => toggleAllRemote(false));
 
   $("providerForm").addEventListener("submit", async (e) => {
-    const action = e.submitter?.value;
-    if (action !== "save") return;
     e.preventDefault();
+    const action = e.submitter?.value;
+    if (action === "cancel") {
+      $("providerDialog").close();
+      return;
+    }
+    if (action !== "save") return;
+    
     const fd = new FormData($("providerForm"));
     const baseUrl = (fd.get("baseUrl") || "").toString().trim();
     const apiKey = (fd.get("apiKey") || "").toString().trim();
@@ -616,9 +621,14 @@ async function onTemplateAction(act, id) {
 function bindTemplateDialog() {
   $("addTemplateBtn").addEventListener("click", () => openTemplateDialog(null));
   $("templateForm").addEventListener("submit", async (e) => {
-    const action = e.submitter?.value;
-    if (action !== "save") return;
     e.preventDefault();
+    const action = e.submitter?.value;
+    if (action === "cancel") {
+      $("templateDialog").close();
+      return;
+    }
+    if (action !== "save") return;
+    
     const fd = new FormData($("templateForm"));
     const id = (fd.get("id") || `tpl-${crypto.randomUUID().slice(0, 8)}`).toString();
     const t = {

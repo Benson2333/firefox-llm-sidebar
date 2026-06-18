@@ -27,6 +27,16 @@ import { reportError, reportWarning, installGlobalHandlers } from "../lib/error-
 // 装全局错误兜底（捕获 sidebar 页面未捕获的异常 / Promise 拒绝）
 installGlobalHandlers();
 
+// ---------- 全局状态 ----------
+
+let state = {
+  settings: null,
+  providers: [],
+  templates: [],
+  modelInfo: null,
+  busy: { summary: false, translate: false, chat: false },
+};
+
 // ---------- background 连接（带自动重连）----------
 
 let port = null;
@@ -523,14 +533,6 @@ const els = {
 
 // ---------- 启动 ----------
 
-let state = {
-  settings: null,
-  providers: [],
-  templates: [],
-  modelInfo: null,
-  busy: { summary: false, translate: false, chat: false },
-};
-
 // 预热 vendor（让首次创建 sink 时快一点）
 ensureSinkReady();
 
@@ -762,7 +764,10 @@ function bindUI() {
 
   // 折叠/展开 sidebar 内容区
   els.collapseBtn?.addEventListener("click", () => {
-    document.body.classList.toggle("sidebar-collapsed");
+    const isCollapsed = document.body.classList.toggle("sidebar-collapsed");
+    // 更新按钮提示
+    els.collapseBtn.title = isCollapsed ? "展开" : "折叠/展开";
+    els.collapseBtn.setAttribute("aria-label", isCollapsed ? "展开" : "折叠/展开");
   });
 
   // 双击顶栏 brand 区域 = ping background（诊断用）

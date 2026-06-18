@@ -271,12 +271,126 @@ async function fetchActiveTabAndExtract() {
   if (!tab.url || tab.url.startsWith("about:") || tab.url.startsWith("moz-extension:")) {
     throw new Error("此页面无法提取内容");
   }
+  
+  // 检测本地文件和PDF
+  const isFileUrl = tab.url.startsWith("file://");
+  const isPdf = tab.url.toLowerCase().endsWith(".pdf");
+  
   try {
+    // 先尝试常规提取
     const extracted = await extractInPage(tab.id);
+    if (extracted && extracted.text && extracted.text.length >= 20) {
+      return { extracted, tab };
+    }
+  } catch (e) {
+    // 如果常规提取失败，尝试备用方案
+    console.warn("[sidebar-ai] 常规提取失败，尝试备用方案", e);
+  }
+  
+  // 备用方案：对于本地文件和PDF等特殊页面
+  try {
+    const extracted = await extractFallback(tab);
     return { extracted, tab };
   } catch (e) {
     throw new Error(`提取页面失败：${e.message || e}`);
   }
+}
+
+// ---------- 备用提取方案（处理本地文件、PDF等）----------
+
+async function extractFallback(tab) {
+  const url = tab.url;
+  const isPdf = url.toLowerCase().endsWith(".pdf");
+  const isFileUrl = url.startsWith("file://");
+  
+  // 方案1：尝试从页面获取可见文本
+  try {
+    const [{ result }] = await browser.scripting.executeScript({
+      target: { tabId: tab.id },
+      func: () => {
+        // 获取页面标题
+        const title =
+          document.querySelector('meta[property="og:title"]')?.getAttribute("content") ||
+          document.querySelector("title")?.textContent?.trim() ||
+          document.querySelector("h1")?.textContent?.trim() ||
+          document.location.href.split("/").pop() ||
+          "";
+        
+        // 对于PDF viewer，尝试获取文本内容
+        let text = "";
+        
+        // 检查是否是PDF viewer
+        if (document.querySelector('embed[type="application/pdf"]') || 
+            document.querySelector('iframe[src*=".pdf"]') ||
+            document.location.pathname.toLowerCase().endsWith(".pdf")) {
+          
+          // 尝试获取PDF viewer中的文本元素
+          const pdfTextElements = document.querySelectorAll('text, .textLayer > div, [class*="text"]');
+          if (pdfTextElements.length > 0) {
+            text = Array.from(pdfTextElements)
+              .map(el => el.textContent?.trim())
+              .filter(Boolean)
+              .join("\n");
+          }
+        }
+        
+        // 如果还没有文本，获取body中所有可见文本
+        if (!text || text.length < 20) {
+          // 移除脚本和样式
+          const clone = document.body.cloneNode(true);
+          clone.querySelectorAll("script, style, noscript").forEach(n => n.remove());
+          text = clone.textContent || "";
+        }
+        
+        // 清理文本
+        text = text
+          .replace(/\s+\n/g, "\n")
+          .replace(/\n{3,}/g, "\n\n")
+          .replace(/[ \t]{2,}/g, " ")
+          .trim();
+        
+        // 截断过长文本
+        const MAX_CHARS = 24000;
+        const truncated = text.length > MAX_CHARS;
+        if (truncated) text = text.slice(0, MAX_CHARS) + "\n\n[...内容已截断...]";
+        
+        return {
+          title,
+          text,
+          excerpt: text.slice(0, 240).replace(/\s+/g, " ").trim(),
+          length: text.length,
+          truncated,
+          isFallback: true,
+        };
+      },
+    });
+    
+    if (result && result.text && result.text.length >= 20) {
+      return result;
+    }
+  } catch (e) {
+    console.warn("[sidebar-ai] 备用提取方案1失败", e);
+  }
+  
+  // 方案2：对于本地文件，至少返回文件名和URL
+  const fallbackTitle = isPdf ? "PDF 文件" : 
+                        isFileUrl ? "本地文件" :
+                        tab.title || url.split("/").pop() || "未知";
+  const fallbackText = `${fallbackTitle}\n\nURL: ${url}\n\n` +
+    (isPdf ? "提示：此页面是PDF文件，当前浏览器可能限制直接访问PDF内容。" :
+     isFileUrl ? "提示：此页面是本地文件，部分内容可能受浏览器安全策略限制。" :
+     "提示：无法直接提取此页面的内容。");
+  
+  return {
+    title: fallbackTitle,
+    text: fallbackText,
+    excerpt: fallbackText.slice(0, 240).replace(/\s+/g, " ").trim(),
+    length: fallbackText.length,
+    truncated: false,
+    isFallback: true,
+    isPdf,
+    isFileUrl,
+  };
 }
 
 // ---------- 主任务流程：summary / translate ----------

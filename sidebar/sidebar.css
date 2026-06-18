@@ -577,7 +577,9 @@ body.sidebar-collapsed .error-badge {
 .history-btn.star-btn { color: #f59e0b; }
 
 /* Sidebar 折叠状态 */
-body.sidebar-collapsed .topbar,
+body.sidebar-collapsed .topbar .brand,
+body.sidebar-collapsed .topbar #activeModelSelect,
+body.sidebar-collapsed .topbar #openSettingsBtn,
 body.sidebar-collapsed .tabs,
 body.sidebar-collapsed .content,
 body.sidebar-collapsed .chat-toolbar,
@@ -585,6 +587,17 @@ body.sidebar-collapsed .vision-fab,
 body.sidebar-collapsed .history-search-row,
 body.sidebar-collapsed .compare-results {
   display: none !important;
+}
+body.sidebar-collapsed .topbar {
+  justify-content: center;
+  padding: 8px 10px;
+}
+body.sidebar-collapsed .topbar-actions {
+  justify-content: center;
+}
+body.sidebar-collapsed #collapseBtn {
+  display: inline-flex !important;
+  transform: rotate(180deg);
 }
 body.sidebar-collapsed .statusbar {
   padding: 8px 10px;
