@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "LLM 侧边栏",
-  "version": "0.2.0",
-  "description": "在 Firefox 侧边栏中调用任意 LLM（OpenAI、Claude、Gemini、DeepSeek、Ollama 等），总结/翻译/聊天，自带 API key。",
+  "version": "0.3.0",
+  "description": "在 Firefox 侧边栏中调用任意 LLM（OpenAI、Claude、Gemini、DeepSeek、Ollama 等），总结/翻译/聊天，自带 API key。支持中国主流大模型和本地文件处理。",
 
   "browser_specific_settings": {
     "gecko": {

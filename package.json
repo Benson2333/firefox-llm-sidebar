@@ -1,6 +1,6 @@
 {
   "name": "firefox-llm-sidebar",
-  "version": "0.1.0",
+  "version": "0.3.0",
   "private": true,
   "description": "Firefox MV3 sidebar extension that integrates multiple LLM providers (OpenAI, DeepSeek, Claude, Gemini, Ollama, ...) for page summarization, translation, and chat.",
   "scripts": {
