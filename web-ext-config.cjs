@@ -16,14 +16,13 @@
 //
 // 注意：web-ext 10.x 对子命令（lint/build/run/sign）的选项严格区分，
 // 嵌套结构 `{ lint: {...} }` 在某些版本不被支持，所以一律走 CLI 标志。
-// 配置文件只用于注入 API key（从环境变量），避免硬编码到 git。
+// apiKey/apiSecret 只能通过命令行传递，不支持在配置文件中设置。
 
 module.exports = {
-  // AMO API key 优先用环境变量，避免硬编码到 git
-  // 设置：$env:AMO_API_KEY="..."; $env:AMO_API_SECRET="..."
-  apiKey: process.env.AMO_API_KEY,
-  apiSecret: process.env.AMO_API_SECRET,
-  apiUrlPrefix: 'https://addons.mozilla.org/api/v5', // 现行 API
-  timeout: 15 * 60 * 1000, // 15 分钟（AMO 签名有时候比较慢）
+  // 注意：apiKey 和 apiSecret 必须通过命令行传递：
+  //   web-ext sign --api-key=$AMO_API_KEY --api-secret=$AMO_API_SECRET
+  // 或者在 .env 文件中设置（需要 web-ext-dotenv 插件）
+  //
+  // 配置文件只能设置 lint/build/run 等支持的选项：
+  // timeout: 15 * 60 * 1000, // 15 分钟（AMO 签名有时候比较慢）
 };
-
